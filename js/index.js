@@ -54,9 +54,8 @@ window.onload = () => {
       this.y = -10;
       this.width = 130;
       this.height = 30;
-      this.color = "#870007";
+      this.color = "#850017";
       this.ctx = ctx;
-      
     }
 
     draw() {
@@ -68,6 +67,17 @@ window.onload = () => {
       this.y += 5;
     }
 
+    hasCollision(car) {
+      if (
+        car.x < this.x + this.width &&
+        car.x + car.width > this.x &&
+        car.y < this.y + this.height &&
+        car.y + car.height > this.y
+      ) {
+        return true;
+      }
+      return false;
+    }
   }
 
   function createObstacle() {
@@ -103,7 +113,7 @@ window.onload = () => {
       update();
     }, 2000);
 
-    gameInterval = setInterval(update, 1000 / 60);
+    gameInterval = setInterval(update, 20);
   }
 
   // updates and renders new values
@@ -114,18 +124,33 @@ window.onload = () => {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
     car.draw();
-    // ctx.font = "19px Arial";
-    // ctx.fillText(`Score: ${score}`, 10, 50);
 
-   
+    ctx.fillText(`Score: ${score}`, 10, 50);
+
     carObstacles.forEach((obstacle) => {
       obstacle.draw();
       obstacle.moveVertically();
+
+      if (obstacle.hasCollision(car)) {
+        clearInterval(interval);
+        clearInterval(gameInterval);
+        
+
+        ctx.fillStyle = "black";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "white";
+        ctx.font = "48px Arial";
+        ctx.fillText("Game Over", 125, 300);
+        ctx.fillStyle = "#870007";
+        ctx.font = "38px Arial";
+        ctx.fillText(`Score: ${score}`, 150, 450);
+        
+      }
     });
 
-
-
-    carObstacles = carObstacles.filter((obstacle) => obstacle.y < canvas.height);
+    carObstacles = carObstacles.filter(
+      (obstacle) => obstacle.y < canvas.height
+    );
   }
 
   // add key events and move car
